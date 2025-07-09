@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DCSN-SSO-FRONTEND
 
 npm run dev -- --host
@@ -92,3 +93,6 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+=======
+# dcsn-sso-frontend
+>>>>>>> ff0e4a22be2b3c2c0c1015aca31a4f558a790aef
