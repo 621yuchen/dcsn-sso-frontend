@@ -1,6 +1,9 @@
 // utils/request.js
 import axios from 'axios'
 
+// 从环境变量中获取 API 基础 URL
+const baseURL = import.meta.env.VITE_API_BASE_URL
+
 class Request {
   constructor(baseURL, timeout = 10000) {
     this.instance = axios.create({
@@ -14,25 +17,19 @@ class Request {
 
   // 设置拦截器
   setupInterceptors() {
-    // 请求拦截器
     this.instance.interceptors.request.use(
         config => {
-          // 可以从 localStorage 或 cookie 获取 token
           const token = localStorage.getItem('token')
           if (token) {
             config.headers.Authorization = `Bearer ${token}`
           }
           return config
         },
-        error => {
-          return Promise.reject(error)
-        }
+        error => Promise.reject(error)
     )
 
-    // 响应拦截器
     this.instance.interceptors.response.use(
         response => {
-          // 根据后端返回的数据结构进行调整
           const { data } = response
           if (data.code && data.code !== 200) {
             this.showError(data.message || '请求失败')
@@ -47,18 +44,14 @@ class Request {
     )
   }
 
-  // 错误处理
   handleError(error) {
     let errorMessage = '请求错误'
 
     if (error.response) {
-      // 请求已发出，服务器返回状态码不在 2xx 范围内
       const { status, data } = error.response
-
       switch (status) {
         case 401:
           errorMessage = '未授权，请登录'
-          // 跳转到登录页
           if (typeof window !== 'undefined') {
             window.location.href = '/login'
           }
@@ -76,26 +69,21 @@ class Request {
           errorMessage = data?.message || `请求错误 ${status}`
       }
     } else if (error.request) {
-      // 请求已发出但没有收到响应
       errorMessage = '网络错误，请检查网络连接'
     } else {
-      // 发送请求时出错
       errorMessage = error.message || '未知错误'
     }
 
     this.showError(errorMessage)
   }
 
-  // 显示错误信息（可根据项目使用不同的UI提示）
   showError(message) {
     console.error(message)
-    // 这里可以使用 alert 或集成 UI 框架的提示组件
     if (typeof window !== 'undefined') {
       alert(message)
     }
   }
 
-  // 封装请求方法
   get(url, params, config = {}) {
     return this.instance.get(url, { params, ...config })
   }
@@ -112,7 +100,6 @@ class Request {
     return this.instance.delete(url, { params, ...config })
   }
 
-  // 上传文件
   upload(url, file, config = {}) {
     const formData = new FormData()
     formData.append('file', file)
@@ -126,6 +113,6 @@ class Request {
 }
 
 // 创建请求实例
-const request = new Request( '/api')
+const request = new Request(baseURL)
 
 export default request
